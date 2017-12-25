@@ -10,7 +10,6 @@
 //standar
 #include <fstream>
 #include <unistd.h>
-
 #include <arpa/inet.h>
 
 //opencv
@@ -32,7 +31,6 @@ public:
     int receive_int(int *num);
     int send_int(int num);
 
-
 private:
     int sock;
     char IplsendBuff[sizeof(IplImage)];
@@ -44,4 +42,4 @@ private:
     int readLine(char data[],int maxlen);
 };
 
-#endif  CLIENT_H
+#endif CLIENT_H
