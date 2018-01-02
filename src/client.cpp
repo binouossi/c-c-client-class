@@ -44,7 +44,7 @@ char* client::lire()
 {
     int n = NULL;
     this->receive_int(&n);
-
+//    this->receive_int(n);
     if(n==0||n==NULL)
     {
         return NULL;
@@ -93,6 +93,9 @@ IplImage* client::IplImageRecv()
     int H=NULL,W=NULL;
     this->receive_int(&H);
     this->receive_int(&W);
+
+/*        this->receive_int(H);
+        this->receive_int(W);*/
 
     if(W==0||W==NULL)
         W=IMAGE_WIDTH;
@@ -180,13 +183,15 @@ IplImage* client::get_im()
     return hi;
 }
 
-int client::receive_int(int *num)
+int client::receive_int(int* num)
 {
     char buf[10] = "";
 
     recv( sock , buf , sizeof buf , 0 );
 
     sscanf( buf , "%d" , num );
+
+//    recv(this->sock, (char*)num, sizeof(int), NULL);
 
     return 0;
 }
@@ -198,6 +203,8 @@ int client::send_int(int num)
     sprintf( buf , "%d" , num );
 
     send( this->sock , buf , sizeof buf , 0 );
+
+    //recv(this->sock, (char*)num, sizeof(int), NULL);
 
     return 0;
 }
