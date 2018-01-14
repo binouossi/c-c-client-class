@@ -5,19 +5,20 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    printf("bout");
-    client* nini=new client("nini");
+    client* nini=new client();
     for(int i=0;i<25;i++)
     {
-        nini->stringsender("suis la!");
-        char* gi=nini->lire();
+        nini->str_sender("suis la!");
+
+        char* gi=nini->str_reader();
         cout<<gi<<endl;
         int hi;
-        nini->receive_int(&hi);
+        nini->int_reader(&hi);    printf("bout\n");
+
 //        nini->receive_int(hi);
 
         cout<<hi<<endl;
-        nini->send_int(3);
+        nini->int_sender(3);
     }
 
     printf("fin\n");

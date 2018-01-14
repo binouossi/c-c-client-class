@@ -1,8 +1,8 @@
 #include "client.h"
 
-client::client(char* user)
+client::client()
 {
-    this->user=user;
+ //   this->user=user;
 
       if((this->sock = socket(AF_INET, SOCK_STREAM, 0))< 0)
         {
@@ -10,11 +10,11 @@ client::client(char* user)
         }
       this->serv_addr.sin_family = AF_INET;
       this->serv_addr.sin_port = htons(5000);
-      serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+      serv_addr.sin_addr.s_addr = inet_addr( ADDR);
 
 /* to read address from file
       const char* addr;
-      addr=this->getaddr("/etc/Face_client").c_str();
+      ADDR=this->getaddr("/etc/Face_client").c_str();
       this->serv_addr.sin_addr.s_addr = inet_addr(addr);*/
 
       if(connect(this->sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr))<0)
@@ -24,7 +24,7 @@ client::client(char* user)
         }
 }
 
-string client::getaddr(char* path)
+string client::get_addr(char* path)
 {
     std::ifstream monFlux(path);
     if(monFlux)
@@ -40,11 +40,12 @@ string client::getaddr(char* path)
     }
 }
 
-char* client::lire()
+char* client::str_reader()
 {
+
     int n = NULL;
-    this->receive_int(&n);
-//    this->receive_int(n);
+    this->int_reader(&n);
+
     if(n==0||n==NULL)
     {
         return NULL;
@@ -56,7 +57,7 @@ char* client::lire()
 
     if(this->lu==NULL)
     {
-        perror("Memiorie allocation error, for socket reader");
+        std::cout<<"Allocation error"<<std::endl;
         return NULL;
     }
 
@@ -66,7 +67,7 @@ char* client::lire()
 
       if( a < n-1)
       {
-        fprintf(stderr,"Read Error");
+        cout<<"Read Error"<<endl;
         return NULL;
       }
 
@@ -74,12 +75,12 @@ char* client::lire()
       return this->lu;
 }
 
-int client::stringsender(char fi[])
+int client::str_sender(char fi[])
 {
 
     int a=strlen(fi);
 
-    this->send_int(a);
+    this->int_sender(strlen(fi));
 
     int n=write(this->sock,fi,std::strlen(fi));
 
@@ -88,11 +89,11 @@ int client::stringsender(char fi[])
     return n;
 }
 
-IplImage* client::IplImageRecv()
+IplImage* client::IplImg_reader()
 {
     int H=NULL,W=NULL;
-    this->receive_int(&H);
-    this->receive_int(&W);
+    this->int_reader(&H);
+    this->int_reader(&W);
 
 /*        this->receive_int(H);
         this->receive_int(W);*/
@@ -138,11 +139,11 @@ IplImage* client::IplImageRecv()
      return im;
 }
 
-int client::IplImagesender(IplImage* im)
+int client::IplImg_sender(IplImage* im)
 {
-    this->send_int(im->height);
+    this->int_sender(im->height);
 
-    this->send_int(im->width);
+    this->int_sender(im->width);
 
     int bytes=0;
     cv::Mat frame=cv::Mat(im,true);
@@ -156,17 +157,8 @@ int client::IplImagesender(IplImage* im)
     return bytes;
 }
 
-client::~client()
-{
-    if(close(this->sock)==0)
-    {
-        std::cout<<"connection ended"<<std::endl;
-    }
 
-    free(this->lu);
-}
-
-IplImage* client::get_im()
+/*IplImage* client::get_im()
 {
     IplImage* hi;
     CvCapture* capture =cvCreateCameraCapture(-1);
@@ -182,33 +174,7 @@ IplImage* client::get_im()
 
     return hi;
 }
-
-int client::receive_int(int* num)
-{
-    char buf[10] = "";
-
-    recv( sock , buf , sizeof buf , 0 );
-
-    sscanf( buf , "%d" , num );
-
-//    recv(this->sock, (char*)num, sizeof(int), NULL);
-
-    return 0;
-}
-
-int client::send_int(int num)
-{
-    char buf[10] = "";
-
-    sprintf( buf , "%d" , num );
-
-    send( this->sock , buf , sizeof buf , 0 );
-
-    //recv(this->sock, (char*)num, sizeof(int), NULL);
-
-    return 0;
-}
-
+*/
 int client::readLine(char data[],int maxlen)
 {
    size_t len = 0;
@@ -229,3 +195,207 @@ int client::readLine(char data[],int maxlen)
       data[len++] = c;
    }
 }
+
+int client::int_reader(int* num)
+{
+    char buf[10] = "";
+
+    int rest=recv( this->sock , buf , sizeof buf , 0 );
+
+    sscanf( buf , "%d" , num );
+
+//    recv(this->sock, (char*)num, sizeof(int), NULL);
+
+    return rest;
+}
+
+int client::int_sender(int num)
+{
+    char buf[10] = "";
+
+    sprintf( buf , "%d" , num );
+
+    int rest=send( this->sock , buf , sizeof buf , 0 );
+
+    //recv(this->sock, (char*)num, sizeof(int), NULL);
+
+    return rest;
+}
+
+int client::file_sender(char* path)
+{
+    ssize_t len;
+    int fd;
+    int sent_bytes = 0;
+    char file_size[256];
+    struct stat file_stat;
+    int offset;
+    int remain_data;
+
+    fd = open(path, O_RDONLY);
+
+    if (fd == -1)
+    {
+        fprintf(OUTPUT, "Error opening file --> %s", strerror(errno));
+        return -1;
+     }
+
+            /* Get file stats */
+     if (fstat(fd, &file_stat) < 0)
+     {
+            fprintf(stderr, "Error fstat --> %s", strerror(errno));
+            return -1;
+     }
+
+     fprintf(OUTPUT, "File Size: \n%d bytes\n", file_stat.st_size);
+
+     sprintf(file_size, "%d", file_stat.st_size);
+
+     len = send(this->sock, file_size, sizeof(file_size), 0);
+     if (len < 0)
+     {
+        fprintf(OUTPUT, "Error on sending greetings --> %s", strerror(errno));
+        return -1;
+     }
+
+     fprintf(stdout, "Server sent %d bytes for the size\n", len);
+
+     offset = 0;
+     remain_data = file_stat.st_size;
+            /* Sending file data */
+     while (((sent_bytes = sendfile(this->sock, fd, (off_t *)&offset, BUFSIZ)) > 0) && (remain_data > 0))
+     {
+        fprintf(OUTPUT, "1. Server sent %d bytes from file's data, offset is now : %d and remaining data = %d\n", sent_bytes, offset, remain_data);
+        remain_data -= sent_bytes;
+        fprintf(OUTPUT, "2. Server sent %d bytes from file's data, offset is now : %d and remaining data = %d\n", sent_bytes, offset, remain_data);
+     }
+
+     return 0;
+
+}
+
+int client::file_reader(char* destination)
+{
+    size_t len;
+    char buffer[BUFSIZ];
+    int file_size;
+   int remain_data = 0;
+   FILE* received_file ;
+
+    recv(this->sock, buffer, BUFSIZ, 0);
+    file_size = atoi(buffer);
+
+     received_file=fopen(destination, "w");
+
+     if (received_file == NULL)
+     {
+        fprintf(OUTPUT, "Failed to open file foo --> %s\n", strerror(errno));
+        return -1;
+     }
+
+     remain_data = file_size;
+
+     while (((len = recv(this->sock, buffer, BUFSIZ, 0)) > 0) && (remain_data > 0))
+    {
+        fwrite(buffer, sizeof(char), len, received_file);
+        remain_data -= len;
+  //      fprintf(stdout, "Receive %d bytes and we hope :- %d bytes\n", len, remain_data);
+    }
+    fclose(received_file);
+
+     return 0;
+}
+
+OM_uint32 client::token_reader(gss_buffer_t tok)
+{
+    int ret, len;
+    ret = this->int_reader(&len);
+
+    if (ret < 0)
+    {
+        perror("reading token length");
+        return -1;
+    } else if (ret != 4)
+    {
+        if (OUTPUT)
+            fprintf(OUTPUT,"reading token length: %d of %d bytes read\n", ret, 4);
+        return -1;
+    }
+    tok->length = len;
+    tok->value = (char *) malloc(tok->length);
+    if (tok->value == NULL)
+    {
+        if (OUTPUT)
+        fprintf(OUTPUT,"Out of memory allocating token data\n");
+        return -1;
+    }
+     tok->value= this->str_reader();
+    if (tok->value==NULL)
+    {
+        perror("reading token data");
+        free(tok->value);
+        return -1;
+    } else if (ret != tok->length)
+    {
+        fprintf(OUTPUT, "sending token data: %d of %d bytes written\n", ret, tok->length);
+        free(tok->value);
+        return -1;
+    }
+    return 0;
+}
+
+OM_uint32 client::token_sender(gss_buffer_t tok)
+{
+    int len, ret;
+    len = htonl((OM_uint32)tok->length);
+    ret = this->int_sender((OM_uint32)tok->length);
+    if (ret < 0)
+    {
+        perror("sending token length");
+        return -1;
+    } else if (ret != 4)
+    {
+        if (OUTPUT)
+            fprintf(OUTPUT, "sending token length: %d of %d bytes written\n", ret, 4);
+        return -1;
+    }
+    ret = str_sender((char*)tok->value);
+    if (ret < 0)
+    {
+        perror("sending token data");
+        return -1;
+    } else if (ret != tok->length)
+    {
+    if (OUTPUT)
+        fprintf(OUTPUT, "sending token data: %d of %d bytes written\n", ret, tok->length);
+        return -1;
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+client::~client()
+{
+    if(close(this->sock)==0)
+    {
+        std::cout<<"connection ended"<<std::endl;
+    }
+
+    free(this->lu);
+}
+
+
