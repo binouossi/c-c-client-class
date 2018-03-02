@@ -25,10 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 HEADERS += \
     include/client.h \
-    include/function.h
 
 INCLUDEPATH += include/
-INCLUDEPATH += /usr/include/opencv2
-LIBS += -lopencv_core
-LIBS += -lopencv_highgui
 

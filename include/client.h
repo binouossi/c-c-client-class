@@ -2,32 +2,18 @@
 #define CLIENT_H
 
 
-//a supprimer pour eviter les redefinition
-#define IMAGE_SIZE 230400
-#define IMAGE_WIDTH 320
-#define IMAGE_HEIGHT 240\
-
 #define ADDR "127.0.0.1"
+#define PORT 5000
+#define CONFIG "/etc/Face_client" //just for who those want to use a config file to manage server's information
+#define OUTPUT stderr
 
-//standar
 #include <fstream>
 #include <unistd.h>
 #include <arpa/inet.h>
-
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/sendfile.h>
+#include <string.h>
+#include <sstream>
 
 #include "function.h"
-
-//opencv
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-
-// gssapi
-
-#include <gss.h>
 
 using namespace std;
 
@@ -35,34 +21,80 @@ class client
 {
 public:
     client();
+
     ~client();
 
-    char* str_reader();
-    int str_sender(char *fi);
+    char* getall();
 
-    int IplImg_sender(IplImage* im);
-    IplImage* IplImg_reader();
+    bool file_reader(char* destination);
 
-//    IplImage* get_im();
-    int int_reader(int *num);
-    int int_sender(int num);
-
-
-    int file_reader(char* destination);
     int file_sender(char* path);
 
-    OM_uint32 token_reader(gss_buffer_t tok);
-    OM_uint32 token_sender(gss_buffer_t tok);
+    template <typename Type>
+    bool operator<<(Type &data);
+
+    template <typename Type>
+    stringstream& operator>>(Type &data);
+
+    string get_addr(char* path);
 
 private:
     int sock;
-    char IplsendBuff[sizeof(IplImage)];
-//    char recvBuff[1024];
-//    char* user;
+
+protected:
+
+    char* str_reader();
+
+    char* str_reader(int size);
+    
+    int int_reader(int *num);
+
+    int int_sender(int num);
+
+    int str_sender(char *fi);
+
     struct sockaddr_in serv_addr;
-    char* lu=NULL;
-    string get_addr(char* path);
-    int readLine(char data[],int maxlen);
+
+    int str_sender(char* fi, int size);
 };
+
+template <typename Type>
+stringstream& client::operator>> (Type& don)
+{
+    int size=NULL;
+
+    stringstream nin;
+
+    nin.flush();
+
+    this->int_reader(&size);
+
+    char* data= this->str_reader(size);
+
+    nin<<data;
+
+    nin>>don;
+
+    return nin;
+}
+
+template <typename Type>
+bool client::operator<<(Type &data)
+{
+    stringstream nout;
+
+    nout<<data;
+
+    char* buf=const_cast<char*>(nout.str().c_str());
+
+    int size=strlen(buf);
+
+    if(this->str_sender(buf,size)<0)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 #endif CLIENT_H

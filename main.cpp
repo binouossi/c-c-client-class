@@ -5,22 +5,26 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    client* nini=new client();
-    for(int i=0;i<25;i++)
-    {
-        nini->str_sender("suis la!");
 
-        char* gi=nini->str_reader();
-        cout<<gi<<endl;
-        int hi;
-        nini->int_reader(&hi);    printf("bout\n");
 
-//        nini->receive_int(hi);
+    client nini;
 
-        cout<<hi<<endl;
-        nini->int_sender(3);
-    }
+    char* msg="suis la! ah la!";
+    cout<<msg<<endl;
+    nini<<msg;
+    char* rest=nini.getall();
+
+    cout<<rest<<endl;
+
+    double hi=5.256;
+    cout<<hi<<endl;
+    nini<<hi;
+    nini>>hi;
+    cout<<hi<<endl;
+    nini.file_reader("/home/cani/test01");
+    nini.file_sender("/home/cani/test01");
 
     printf("fin\n");
+
     return 0;
 }
