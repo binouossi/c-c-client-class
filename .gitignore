@@ -71,7 +71,9 @@ Thumbs.db
 *.dll
 *.exe
 *.pro
-.gitignore
 *.pro
-.gitignore
 
+# IDE
+
+.vscode/*
+.idea/*

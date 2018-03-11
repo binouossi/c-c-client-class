@@ -37,14 +37,7 @@ This is the beta version
 # License
 
 This library, is offer as **LGPL License**. Than, it's free for personal and commercial uses.
-<!--# Author
-**name: *Emmanuel TACOLODJOU* **
-**Email: _tacolodjounini@gmail.com_**
-
-Je ne sais pas si tu l'as remarqué mais en géneral on s'en fout de l'auteur.
--->
 
 # Contributions
 
 Any contributions are welcome on this project. You can contribute by creating github issue or helping in the improvement of the algorithm. 
-<!--  I invite everyone, to help me, in the development of this class, by sending feedback, and by proposing better algorithms.-->
