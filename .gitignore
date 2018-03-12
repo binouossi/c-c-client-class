@@ -1,4 +1,4 @@
-# This file is used to ignore files which are generated
+#s file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
 *~
@@ -71,7 +71,13 @@ Thumbs.db
 *.dll
 *.exe
 *.pro
-.gitignore
 *.pro
-.gitignore
+
+# IDE
+
+.vscode/*
+.idea/*
+.vscode
+.idea
+
 
