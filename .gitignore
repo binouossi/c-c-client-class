@@ -77,7 +77,8 @@ Thumbs.db
 
 .vscode/*
 .idea/*
-.vscode
+
 .idea
 
 
+.vscode
