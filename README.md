@@ -1,5 +1,9 @@
 # c/c++ socket client class
 
+## Author
+**NAME: _TACOLODJOU Emmanuel_**  
+**Email: _tacolodjounini@gmail.com_**
+
 # Presentation
 This is the client part of a c/c++ library, which makes easier the use the socket connection. It contains a **class** to initiate communication, methods and operators to send and receive data, over a network.
 

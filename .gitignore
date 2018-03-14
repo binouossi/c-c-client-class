@@ -1,4 +1,4 @@
-# This file is used to ignore files which are generated
+#s file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
 *~
@@ -77,6 +77,8 @@ Thumbs.db
 
 .vscode/*
 .idea/*
-.vscode
+
 .idea
 
+
+.vscode
